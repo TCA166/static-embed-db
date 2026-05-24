@@ -11,7 +11,7 @@ inputs:
   dist_dir:
     description: 'Output directory for the built site'
     required: false
-    default: '../dist'
+    default: './dist'
 runs:
   using: 'composite'
   steps:

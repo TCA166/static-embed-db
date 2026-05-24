@@ -54,4 +54,23 @@ jobs:
         with:
           glob: '../*/*.tex'
           strip_paths: 1
+          dist_dir: .
 ```
+
+The above, will generate the embeddings based on `.tex` files in subdirectories
+of the current directory and build the frontend into `dist/` in the current
+directory.
+
+## Architecture
+
+First, in Python, a given embedding model is loaded and converted to ONNX
+format. After that, the provided files are loaded, preprocessed using lexers
+provided by `pygments`, and converted into embeddings using the ONNX model.
+With the embeddings generated, the frontend is built, under the following
+assumptions:
+
+- The model is available under `/model/`
+- The embedding DB is available as `/embeddings.json`
+- The indexed files in the DB are available, under the paths provided to
+  `generate.py`. Here; the `--strip_paths` option may come in handy to adjust
+  the file paths in the DB.
