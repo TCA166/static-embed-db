@@ -36,3 +36,22 @@ the frontend into a single output directory `dist/`.
 ```sh
 ./build.sh ../notes/*/*.tex --strip_paths 3
 ```
+
+## GitHub Actions
+
+This repository includes a GitHub Actions workflow component, which can be used
+to automate the embedding and deployment process.
+
+```yaml
+name: Test Static Embed DB Action
+
+jobs:
+  build-embed-db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: TCA166/static-embed-db@main # or @v1 after tagging
+        with:
+          tex_glob: '../*/*.tex'
+          strip_paths: 2
+```
