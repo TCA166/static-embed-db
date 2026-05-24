@@ -1,6 +1,8 @@
 # Static embedding search
 
 Comprehensive solution for providing context-aware static file search.
+By default, built for static deployment of LaTeX files with open sources, but
+can be adapted for any static file type.
 
 ## Usage
 
@@ -13,11 +15,24 @@ python3 save_model.py --model <your_model_name>
 2. Generate the embeddings for your static files
 
 ```sh
-python3 generate.py ./files/*.tex
+python3 generate.py ../notes/*/*.tex --strip_paths 3
 ```
+
+Here the `--strip_paths 3` option strips the first 2 path components from the
+file name. The saved file links will be automatically adjusted to point to the
+PDF files, however, manually may be changed using the `--path_suffix .pdf`
+option.
 
 3. Serve the embeddings
 
 ```sh
 npm run dev
+npm run build
+```
+
+**Alternatively** you can just run `./build.sh` to build the embeddings and
+the frontend into a single output directory `dist/`.
+
+```sh
+./build.sh ../notes/*/*.tex --strip_paths 3
 ```

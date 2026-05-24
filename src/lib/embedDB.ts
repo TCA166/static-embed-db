@@ -11,6 +11,7 @@ export type EmbedDBEntry = {
 	line: number;
 	chunk: string;
 	embedding: number[];
+	path: string;
 };
 
 export type QueryResult = {

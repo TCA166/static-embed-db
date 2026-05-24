@@ -1,5 +1,6 @@
 import json
 import re
+import subprocess
 from pathlib import Path
 
 import torch
@@ -8,13 +9,25 @@ from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_for_filename
 from pygments.token import Text
 from pygments.util import ClassNotFound
-from sympy import SympifyError
-from sympy.parsing.latex import LaTeXParsingError, parse_latex
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
 CLEAN = re.compile(r"\\[a-zA-Z]+\{.*?\}|\\[a-zA-Z]+")
 
+def get_pdf_page_for_line(source_path: Path, line: int):
+    cmd = [
+        "synctex", "view",
+        "-i", f"{line}:0:{str(source_path.resolve())}",
+        "-o", str(source_path.with_suffix(".pdf").resolve())
+    ]
+    try:
+        output = subprocess.check_output(cmd, universal_newlines=True)
+        for out in output.splitlines():
+            if out.strip().startswith("Page:"):
+                return int(out.strip().split(":")[1])
+    except Exception as e:
+        print(f"Error running synctex: {e}")
+    return None
 
 def chunk_text(text: str, n: int):
     chunk = []
@@ -30,19 +43,17 @@ def chunk_text(text: str, n: int):
     if chunk:
         yield " ".join(chunk), len(lines) - 1
 
+def lexer_latex_check(lexer: Lexer) -> bool:
+    return lexer.name == "TeX"
 
 def get_plaintext_tokens(text: str, lexer: Lexer):
     math_content: str | None = None
-    latex_mode = lexer.name == "TeX"
+    latex_mode = lexer_latex_check(lexer)
 
     for type, token in lexer.get_tokens(text):
         if (token == "$$" or token == "$") and latex_mode:
             if math_content is not None:
-                math_content = math_content.strip()
-                try:
-                    parsed = parse_latex(math_content)
-                except (LaTeXParsingError, TypeError, SympifyError):
-                    parsed = math_content
+                parsed = f"${math_content.strip()}$"
                 math_content = None
                 yield parsed
             else:
@@ -94,6 +105,7 @@ def main():
         default=0,
         help="Strip n levels of paths from file names",
     )
+    parser.add_argument("--path_suffix", help="Suffix to add to file paths")
     args = parser.parse_args()
 
     model = ORTModelForFeatureExtraction.from_pretrained(args.model)
@@ -106,9 +118,11 @@ def main():
         with open(fname, "r", encoding="utf-8") as f:
             contents = f.read()
 
+        latex_mode = False
         if not args.raw:
             try:
                 lexer = get_lexer_for_filename(fname.name)
+                latex_mode = lexer_latex_check(lexer)
                 contents = extract_plain_text(contents, lexer)
             except ClassNotFound as e:
                 print(f"Warning: {e}")
@@ -121,7 +135,17 @@ def main():
         for (chunk, line), embedding in zip(
             chunks, (get_embedding(chunk, model, tokenizer) for chunk, _ in chunks)
         ):
-            path = "".join(fname.parts[-args.strip_paths :])
+            path = Path(*fname.parts[args.strip_paths :])
+
+            if args.path_suffix:
+                path = path.with_suffix(args.path_suffix)
+
+            if latex_mode:
+                synctex_name = fname.with_suffix(".synctex.gz")
+                if synctex_name.exists():
+                    pdf_page = get_pdf_page_for_line(fname, line)
+                    if pdf_page is not None:
+                        path = path.with_suffix(f".pdf#page={pdf_page}")
 
             result.append(
                 {
@@ -129,7 +153,7 @@ def main():
                     "chunk": chunk,
                     "embedding": embedding.tolist(),
                     "line": line,
-                    "path": path,
+                    "path": str(path),
                 }
             )
 

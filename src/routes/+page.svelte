@@ -33,6 +33,12 @@
 
 		$dbStore?.search($query).then((res) => results.set(res));
 	}
+
+	async function link_available(link: string): Promise<boolean> {
+		return fetch(link, { method: 'HEAD' })
+			.then((res) => res.ok)
+			.catch(() => false);
+	}
 </script>
 
 <Card class="mt-5 flex-grow-1 mb-5">
@@ -53,13 +59,28 @@
 
 		{#if $results != null}
 			<ListGroup class="mt-4">
-				{#each $results as result (result.entry.file + result.entry.chunk)}
+				{#each $results as result (result.entry.file + result.entry.line)}
 					<ListGroupItem>
-						<div class="fw-bold">{result.entry.file}:{result.entry.line}</div>
+						<div class="fw-bold">
+							{result.entry.file}
+						</div>
 						<div class="text-muted" style="font-size: 0.9em;">
 							{result.entry.chunk.slice(0, TEXT_CUTOFF)}...
 						</div>
 						<div class="badge bg-secondary mt-1">Score: {result.score.toFixed(2)}</div>
+						{#if result.entry.path}
+							<div style="position: absolute; top: 0.5rem; right: 0.5rem;">
+								<Button
+									title="Open file"
+									href={result.entry.path}
+									size="sm"
+									type="button"
+									color="primary"
+								>
+									<i class="bi bi-box-arrow-up-right"></i>
+								</Button>
+							</div>
+						{/if}
 					</ListGroupItem>
 				{/each}
 			</ListGroup>
