@@ -52,6 +52,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: TCA166/static-embed-db@main # or @v1 after tagging
         with:
-          tex_glob: '../*/*.tex'
-          strip_paths: 2
+          glob: '../*/*.tex'
+          strip_paths: 1
 ```

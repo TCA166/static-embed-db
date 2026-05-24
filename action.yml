@@ -1,8 +1,8 @@
 name: 'Static Embed DB Builder'
-description: 'Builds static embed DB site from LaTeX files'
+description: 'Builds static embed DB site from files'
 inputs:
-  tex_glob:
-    description: 'Glob pattern for input .tex files'
+  glob:
+    description: 'Glob pattern for input files'
     required: true
   strip_paths:
     description: 'Number of path components to strip'
@@ -15,9 +15,11 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - run: sudo apt-get update && sudo apt-get install -y texlive
+      shell: bash
     - run: git clone https://github.com/TCA166/static-embed-db.git src-static-embed-db
       shell: bash
-    - run: cd src-static-embed-db && ./build.sh ${{ inputs.tex_glob }} --strip_paths ${{ inputs.strip_paths }}
+    - run: cd src-static-embed-db && ./build.sh ${{ inputs.glob }} --strip_paths ${{ inputs.strip_paths }}
       shell: bash
     - run: cp -a src-static-embed-db/dist/. ${{ inputs.dist_dir }}
       shell: bash
