@@ -74,3 +74,5 @@ assumptions:
 - The indexed files in the DB are available, under the paths provided to
   `generate.py`. Here; the `--strip_paths` option may come in handy to adjust
   the file paths in the DB.
+
+Feel free to reference [my use-case](https://github.com/TCA166/notes/blob/main/.github/workflows/static.yml), deployed at [GitHub Pages](https://tca166.github.io/notes/search.html).
