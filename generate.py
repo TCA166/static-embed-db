@@ -88,6 +88,12 @@ def main():
         "--outfile", default="./static/embeddings.json", help="Output JSON file"
     )
     parser.add_argument("--raw", action="store_true", help="Output raw text chunks")
+    parser.add_argument(
+        "--strip_paths",
+        type=int,
+        default=0,
+        help="Strip n levels of paths from file names",
+    )
     args = parser.parse_args()
 
     model = ORTModelForFeatureExtraction.from_pretrained(args.model)
@@ -115,12 +121,15 @@ def main():
         for (chunk, line), embedding in zip(
             chunks, (get_embedding(chunk, model, tokenizer) for chunk, _ in chunks)
         ):
+            path = "".join(fname.parts[-args.strip_paths :])
+
             result.append(
                 {
-                    "file": fname.name,
+                    "file": fname.stem,
                     "chunk": chunk,
                     "embedding": embedding.tolist(),
                     "line": line,
+                    "path": path,
                 }
             )
 
