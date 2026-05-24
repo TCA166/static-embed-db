@@ -12,7 +12,7 @@ def main():
     parser.add_argument(
         "--model", type=str, default="sentence-transformers/all-MiniLM-L6-v2"
     )
-    parser.add_argument("--model_dump", type=str, default="./public/model")
+    parser.add_argument("--model_dump", type=str, default="./static/model")
     args = parser.parse_args()
 
     onnx_model = ORTModelForFeatureExtraction.from_pretrained(args.model, export=True)

@@ -55,11 +55,9 @@
 			<ListGroup class="mt-4">
 				{#each $results as result (result.entry.file + result.entry.chunk)}
 					<ListGroupItem>
-						<div class="fw-bold">{result.entry.file}</div>
+						<div class="fw-bold">{result.entry.file}:{result.entry.line}</div>
 						<div class="text-muted" style="font-size: 0.9em;">
-							{result.entry.chunk.slice(0, TEXT_CUTOFF)}{result.entry.chunk.length > TEXT_CUTOFF
-								? '…'
-								: ''}
+							{result.entry.chunk.slice(0, TEXT_CUTOFF)}...
 						</div>
 						<div class="badge bg-secondary mt-1">Score: {result.score.toFixed(2)}</div>
 					</ListGroupItem>

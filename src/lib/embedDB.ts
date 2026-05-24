@@ -8,6 +8,7 @@ import {
 
 export type EmbedDBEntry = {
 	file: string;
+	line: number;
 	chunk: string;
 	embedding: number[];
 };
