@@ -34,6 +34,9 @@
 	},
 	"dependencies": {
 		"@huggingface/transformers": "^4.2.0",
-		"@sveltejs/adapter-static": "^3.0.10"
+		"@sveltejs/adapter-static": "^3.0.10",
+		"@sveltestrap/sveltestrap": "^7.1.0",
+		"bootstrap": "^5.3.8",
+		"bootstrap-icons": "^1.13.1"
 	}
 }
