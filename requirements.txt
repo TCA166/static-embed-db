@@ -3,5 +3,3 @@ optimum[onnxruntime]
 tqdm
 transformers
 pygments
-sympy
-antlr4-python3-runtime==4.11
