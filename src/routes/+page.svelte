@@ -11,7 +11,8 @@
 		Spinner,
 		Card,
 		CardBody,
-		CardTitle
+		CardTitle,
+		InputGroupText
 	} from '@sveltestrap/sveltestrap';
 
 	import { EmbedDB, type QueryResult } from '$lib/embedDB';
@@ -47,12 +48,12 @@
 		<Form on:submit={handleSubmit}>
 			<InputGroup>
 				<Input type="search" placeholder="Search..." bind:value={$query} />
-				{#if $dbStore == null || $query == ''}
-					<Button type="submit" disabled>Go</Button>
-				{:else if $results?.length == 0}
-					<Spinner />
+				{#if $dbStore == null || $results?.length == 0}
+					<InputGroupText style="width: 60px; justify-content: center;"
+						><Spinner size="sm" /></InputGroupText
+					>
 				{:else}
-					<Button type="submit">Go</Button>
+					<Button type="submit" disabled={$query == ''} style="width: 60px;">Go</Button>
 				{/if}
 			</InputGroup>
 		</Form>
